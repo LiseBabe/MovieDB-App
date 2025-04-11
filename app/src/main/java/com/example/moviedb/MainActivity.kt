@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.example.moviedb.database.Movies
 import com.example.moviedb.ui.theme.MovieDBTheme
 import com.example.moviedb.models.Movie
+import com.example.moviedb.models.Genre
+import com.example.moviedb.database.Genres
 import com.example.moviedb.utils.Constans
 import coil.compose.AsyncImage
 
@@ -41,7 +43,8 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MovieDBApp(
                         name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        screen = "movie"
                     )
                 }
             }
@@ -50,8 +53,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MovieDBApp(name: String, modifier: Modifier = Modifier) {
-    MovieList(movieList = Movies().getMovies(), )
+fun MovieDBApp(name: String, modifier: Modifier = Modifier, screen: String) {
+    if (screen == "movie") {
+        MovieList(movieList = Movies().getMovies(), )
+    }
+    else {
+        GenreList(Genres().getGenres())
+    }
 }
 
 @Composable
@@ -97,10 +105,40 @@ fun MovieListItemCard(movie: Movie, modifier: Modifier = Modifier){
     }
 }
 
+@Composable
+fun GenreList(genreList: List<Genre>, modifier: Modifier = Modifier){
+    LazyColumn(modifier = modifier) {
+        items(genreList){ genre ->
+            GenreListItemCard(genre, modifier.padding(8.dp))
+        }
+    }
+}
+
+@Composable
+fun GenreListItemCard(genre: Genre, modifier: Modifier = Modifier){
+    Card(modifier = modifier) {
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(
+            text = genre.name,
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     MovieDBTheme {
-        MovieDBApp("Android")
+        MovieDBApp("Android",screen = "movie")
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview2() {
+    MovieDBTheme {
+        MovieDBApp("Android",screen = "genre")
     }
 }
