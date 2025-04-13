@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -53,8 +56,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     MovieDBApp(
                         name = "Android",
-                        modifier = Modifier.padding(innerPadding),
-                        screen = "movie"
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
@@ -147,9 +149,13 @@ fun HomeScreen(navController: NavHostController) {
                     Text("Movie Links")
                 }
             }
+        }
+    }
+}
             
+@Composable
 fun GenreList(genreList: List<Genre>, modifier: Modifier = Modifier){
-    LazyColumn(modifier = modifier) {
+    LazyVerticalGrid (columns = GridCells.Fixed(3), modifier = modifier) {
         items(genreList){ genre ->
             GenreListItemCard(genre, modifier.padding(8.dp))
         }
@@ -213,15 +219,18 @@ fun ThirdScreen(navController: NavHostController) {
                     .padding(vertical = 16.dp)
             ) {
                 Text(
-                    text = "Movie Links",
+                    text = "Movie Genres",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
+            GenreList(Genres().getGenres())
         }
     }
 }
 
+@Composable
 fun GenreListItemCard(genre: Genre, modifier: Modifier = Modifier){
     Card(modifier = modifier) {
         Spacer(modifier = Modifier.size(8.dp))
