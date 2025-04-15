@@ -168,7 +168,7 @@ fun HomeScreen(navController: NavHostController) {
                     onClick = { navController.navigate("third") },
                     modifier = Modifier.fillMaxWidth(0.8f)
                 ) {
-                    Text("Movie Links")
+                    Text("List of Genres")
                 }
             }
         }
