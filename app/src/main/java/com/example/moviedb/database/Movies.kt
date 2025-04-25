@@ -7,7 +7,6 @@ class Movies {
         return listOf(
             Movie(
                 278,
-                "tt0111161",
                 "The Shawshank Redemption",
                 "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
                 "/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg",
@@ -16,7 +15,6 @@ class Movies {
             ),
             Movie(
                 238,
-                "tt0068646",
                 "The Godfather",
                 "/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
                 "/tmU7GeKVybMWFButWEGl2M4GeiP.jpg",
@@ -25,7 +23,6 @@ class Movies {
             ),
             Movie(
                 424,
-                "tt0108052",
                 "Schindler's List",
                 "/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
                 "/zb6fM1CX41D9rF9hdgclu0peUmy.jpg",
@@ -34,7 +31,6 @@ class Movies {
             ),
             Movie(
                 129,
-                "tt0245429",
                 "千と千尋の神隠し",
                 "/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",
                 "/6oaL4DP75yABrd5EbC4H2zq5ghc.jpg",
@@ -43,7 +39,6 @@ class Movies {
             ),
             Movie(
                 389,
-                "tt0050083",
                 "12 Angry Men",
                 "/ow3wq89wM8qd5X7hWKxiRfsFf9C.jpg",
                 "/bxgTSUenZDHNFerQ1whRKplrMKF.jpg",

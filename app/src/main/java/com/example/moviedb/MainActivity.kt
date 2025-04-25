@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.moviedb.ui.theme.MovieDBTheme
-import com.example.moviedb.ui.screens.MovieDbApp
+import com.example.moviedb.ui.screens.MovieDBApp
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val windowSize = calculateWindowSizeClass(this)
 
-                    MovieDbApp(windowSize = windowSize.widthSizeClass)
+                    MovieDBApp(windowSize = windowSize.widthSizeClass)
                 }
             }
         }

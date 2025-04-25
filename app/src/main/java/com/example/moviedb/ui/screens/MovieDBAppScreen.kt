@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +37,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moviedb.R
 import com.example.moviedb.database.Movies
 import com.example.moviedb.models.Movie
+import com.example.moviedb.ui.screens.MovieListItemCard
+import com.example.moviedb.ui.screens.MovieListScreen
 import com.example.moviedb.viewmodel.MovieDBViewModel
 import com.example.moviedb.ui.theme.MovieDBTheme
 
@@ -48,19 +51,19 @@ enum class MovieDBScreen(@StringRes val title: Int){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDBAppBar(
-    currScreen: MovieDBScreen,
-    canNavigateBack:Boolean,
+    currentScreen: MovieDBScreen,
+    canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     TopAppBar(
-        title = {Text(stringResource(currScreen.title))},
+        title = {Text(stringResource(currentScreen.title))},
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         modifier = modifier,
         navigationIcon = {
-            if (canNavigateBack){
+            if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -72,15 +75,15 @@ fun MovieDBAppBar(
     )
 }
 @Composable
-fun MovieDbApp(viewModel: MovieDBViewModel = viewModel(),
+fun MovieDBApp(
                navController: NavHostController = rememberNavController(),
                windowWidth: WindowWidthSizeClass,
                windowHeight: WindowHeightSizeClass
 ) {
-    val backStackEntity by navController.currentBackStackEntryAsState()
+    val backStackEntry by navController.currentBackStackEntryAsState()
 
     val currentScreen = MovieDBScreen.valueOf(
-        backStackEntity?.destination?.route ?: MovieDBScreen.List.name
+        backStackEntry?.destination?.route ?: MovieDBScreen.List.name
     )
 
     when (windowWidth) {
@@ -101,54 +104,39 @@ fun MovieDbApp(viewModel: MovieDBViewModel = viewModel(),
 
     Scaffold(
         topBar = {
-            MovieDBAppBar(currScreen = currentScreen,
+            MovieDBAppBar(
+                currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+        val movieDBViewModel: MovieDBViewModel = viewModel(factory =
+            MovieDBViewModel.Factory)
+
         NavHost(
             navController = navController,
             startDestination = MovieDBScreen.List.name,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-        ){
+        ) {
             composable(route = MovieDBScreen.List.name){
                 MovieListScreen(
-                    movieList = Movies().getMovies(),
-                    onMovieListItemClicked = { movie ->
-                        viewModel.setSelectedMovie(movie)
+                    movieListUiState = movieDBViewModel.movieListUiState,
+                    onMovieListItemClicked = {
+                        movieDBViewModel.setSelectedMovie(it)
                         navController.navigate(MovieDBScreen.Detail.name)
                     }, modifier = Modifier.fillMaxSize().padding(16.dp))
             }
-            composable(route = MovieDBScreen.Detail.name){
-                uiState.selectedMovie?.let { movie ->
-                    MovieDetailScreen(movie = movie,
-                        modifier = Modifier)
-                }
+            composable(route = MovieDBScreen.Detail.name) {
+                MovieDetailScreen(
+                    selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
+                    modifier = Modifier
+                )
             }
         }
 
 
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MovieDBTheme {
-        MovieListItemCard(
-            movie = Movie(
-                278,
-                "tt0111161",
-                "The Shawshank Redemption",
-                "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
-                "/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg",
-                "1994-09-23",
-                "Imprisoned in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope."
-            ), {}
-        )
     }
 }
