@@ -34,11 +34,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moviedb.R
 import com.example.moviedb.database.Movies
 import com.example.moviedb.models.Movie
-import com.example.moviedb.ui.screens.MovieDetailScreen
 import com.example.moviedb.ui.screens.MovieListItemCard
 import com.example.moviedb.ui.screens.MovieListScreen
-import com.example.moviedb.ui.theme.MovieDBTheme
 import com.example.moviedb.viewmodel.MovieDBViewModel
+import com.example.moviedb.ui.theme.MovieDBTheme
 
 
 enum class MovieDBScreen(@StringRes val title: Int){
@@ -121,15 +120,16 @@ fun MovieDbApp(viewModel: MovieDBViewModel = viewModel(),
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    MovieDB2025Theme {
+    MovieDBTheme {
         MovieListItemCard(
             movie = Movie(
-                2,
-                "Captain America: Brave New World",
-                "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
-                "/gsQJOfeW45KLiQeEIsom94QPQwb.jpg",
-                "2025-02-12",
-                "When a group of radical activists take over an energy company's annual gala, seizing 300 hostages, an ex-soldier turned window cleaner suspended 50 storeys up on the outside of the building must save those trapped inside, including her younger brother."
+                278,
+                "tt0111161",
+                "The Shawshank Redemption",
+                "/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg",
+                "/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg",
+                "1994-09-23",
+                "Imprisoned in the 1940s for the double murder of his wife and her lover, upstanding banker Andy Dufresne begins a new life at the Shawshank prison, where he puts his accounting skills to work for an amoral warden. During his long stretch in prison, Dufresne comes to be admired by the other inmates -- including an older prisoner named Red -- for his integrity and unquenchable sense of hope."
             ), {}
         )
     }

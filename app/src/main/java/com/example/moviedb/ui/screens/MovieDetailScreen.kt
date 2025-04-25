@@ -1,4 +1,4 @@
-package com.example.moviedb2025.ui.screens
+package com.example.moviedb.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +12,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.moviedb2025.models.Movie
-import com.example.moviedb2025.utils.Constans
+import com.example.moviedb.models.Movie
+import com.example.moviedb.utils.Constans
 
 @Composable
 fun MovieDetailScreen(movie: Movie,

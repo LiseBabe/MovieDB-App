@@ -7,5 +7,5 @@ data class Movie(
     var posterPath: String,
     var backdropPath: String,
     var releaseDate: String,
-    var overviews: String
+    var overview: String
 )
