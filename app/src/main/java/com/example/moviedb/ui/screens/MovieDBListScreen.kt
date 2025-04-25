@@ -28,37 +28,70 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.example.moviedb.models.Movie
-import com.example.moviedb.utils.Constans
+import com.example.moviedb.utils.Constants
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.moviedb.ui.theme.MovieDBTheme
+import com.example.moviedb.viewmodel.MovieListUiState
 
 @Composable
 fun MovieListScreen(
-    movieList: List<Movie>,
+    movieListUiState: MovieListUiState,
     onMovieListItemClicked: (Movie) -> Unit,
     modifier: Modifier = Modifier) {
-    LazyColumn(modifier = modifier) {
-        items(movieList) { movie ->
-            MovieListItemCard(movie = movie, onMovieListItemClicked, modifier = Modifier.padding(8.dp))
+
+    LazyColumn (modifier = modifier) {
+        when(movieListUiState) {
+            is MovieListUiState.Success -> {
+                items(movieListUiState.movies) { movie ->
+                    MovieListItemCard(
+                        movie = movie,
+                        onMovieListItemClicked,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+
+            is MovieListUiState.Loading -> {
+                item {
+                    Text(
+                        text = "Loading...",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            is MovieListUiState.Error -> {
+                item {
+                    Text(
+                        text = "Error: Something went wrong!",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
         }
     }
 }
 
 
 @Composable
-fun MovieListItemCard(movie: Movie,
-                      onMovieListItemClicked: (Movie) -> Unit,
-                      modifier: Modifier = Modifier) {
+fun MovieListItemCard(
+    movie: Movie,
+    onMovieListItemClicked: (Movie) -> Unit,
+    modifier: Modifier = Modifier) {
     val context = LocalContext.current;
     Card(modifier = modifier,
         onClick = {
             onMovieListItemClicked(movie)
-        } )
+        })
     {
         Row {
             Box {
                 AsyncImage(
-                    model = Constans.POSTER_IMAGE_BASE_URL + Constans.POSTER_IMAGE_BASE_WIDTH + movie.posterPath,
+                    model = Constants.POSTER_IMAGE_BASE_URL + Constants.POSTER_IMAGE_BASE_WIDTH + movie.posterPath,
                     contentDescription = movie.title,
-                    modifier = modifier
+                    modifier = Modifier
                         .width(92.dp)
                         .height(138.dp),
                     contentScale = ContentScale.Crop
@@ -90,7 +123,7 @@ fun MovieListItemCard(movie: Movie,
                     text = movie.releaseDate,
                     style = MaterialTheme.typography.bodySmall
                 )
-                Spacer(modifier = androidx.compose.ui.Modifier.size(8.dp))
+                Spacer(modifier = Modifier.size(8.dp))
 
                 Text(
                     text = movie.overview,
@@ -98,7 +131,7 @@ fun MovieListItemCard(movie: Movie,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(modifier = androidx.compose.ui.Modifier.size(8.dp))
+                Spacer(modifier = Modifier.size(8.dp))
             }
         }
     }
@@ -111,4 +144,20 @@ private fun openIMDB(context: Context, id: String) {
     }
     context.startActivity(Intent.createChooser(intent, "Open in IMDB"))
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MovieItemPreview(){
+    MovieDBTheme {
+        MovieListItemCard(movie = Movie(
+            2,
+            "tt14513804",
+            "Captain America: Brave New World",
+            "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
+            "/gsQJOfeW45KLiQeEIsom94QPQwb.jpg",
+            "2025-02-12",
+            "When a group of radical activists take over an energy company's annual gala, seizing 300 hostages, an ex-soldier turned window cleaner suspended 50 storeys up on the outside of the building must save those trapped inside, including her younger brother."
+        ),  {})
+    }
 }
