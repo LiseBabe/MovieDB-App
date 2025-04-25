@@ -18,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,8 +36,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moviedb.R
 import com.example.moviedb.database.Movies
 import com.example.moviedb.models.Movie
-import com.example.moviedb.ui.screens.MovieListItemCard
-import com.example.moviedb.ui.screens.MovieListScreen
 import com.example.moviedb.viewmodel.MovieDBViewModel
 import com.example.moviedb.ui.theme.MovieDBTheme
 
@@ -73,13 +73,31 @@ fun MovieDBAppBar(
 }
 @Composable
 fun MovieDbApp(viewModel: MovieDBViewModel = viewModel(),
-               navController: NavHostController = rememberNavController()
+               navController: NavHostController = rememberNavController(),
+               windowWidth: WindowWidthSizeClass,
+               windowHeight: WindowHeightSizeClass
 ) {
     val backStackEntity by navController.currentBackStackEntryAsState()
 
     val currentScreen = MovieDBScreen.valueOf(
         backStackEntity?.destination?.route ?: MovieDBScreen.List.name
     )
+
+    when (windowWidth) {
+        WindowWidthSizeClass.Compact -> {
+            //Todo implement different size variables for screens
+            // probably need a grid type (list scroll, single item scroll, grid view)
+        }
+        WindowWidthSizeClass.Medium -> {
+
+        }
+        WindowWidthSizeClass.Expanded -> {
+
+        }
+        else -> {
+
+        }
+    }
 
     Scaffold(
         topBar = {
