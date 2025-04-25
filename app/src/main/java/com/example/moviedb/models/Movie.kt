@@ -7,8 +7,6 @@ import kotlinx.serialization.Serializable
 data class Movie(
     @SerialName(value = "id")
     var id: Long = 0L,
-    @SerialName(value = "imdb_id")
-    var imdb_id: String,
     @SerialName(value = "title")
     var title: String,
     @SerialName(value = "poster_path")

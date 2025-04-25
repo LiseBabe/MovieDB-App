@@ -14,4 +14,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-app/src/main/java/com/example/moviedb/utils/SECRETS.kt
+/app/src/main/java/com/example/moviedb/utils/SECRETS.kt

@@ -106,15 +106,15 @@ fun MovieListItemCard(
 
                     Spacer(modifier = Modifier.size(8.dp))
 
-                    IconButton(
-                        onClick = {
-                            openIMDB(context, movie.imdb_id)
-                        }) {
-                        Icon(
-                            imageVector = Icons.Filled.Info,
-                            contentDescription = "IMDB Link"
-                        )
-                    }
+//                    IconButton(
+//                        onClick = {
+////                            openIMDB(context, movie.imdb_id)
+//                        }) {
+//                        Icon(
+//                            imageVector = Icons.Filled.Info,
+//                            contentDescription = "IMDB Link"
+//                        )
+//                    }
                 }
 
                 Spacer(modifier = Modifier.size(8.dp))
@@ -152,7 +152,6 @@ fun MovieItemPreview(){
     MovieDBTheme {
         MovieListItemCard(movie = Movie(
             2,
-            "tt14513804",
             "Captain America: Brave New World",
             "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
             "/gsQJOfeW45KLiQeEIsom94QPQwb.jpg",
