@@ -1,5 +1,7 @@
 package com.example.moviedb.ui.screens
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,14 +12,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.example.moviedb.models.Movie
 import com.example.moviedb.utils.Constans
@@ -39,6 +47,7 @@ fun MovieListScreen(
 fun MovieListItemCard(movie: Movie,
                       onMovieListItemClicked: (Movie) -> Unit,
                       modifier: Modifier = Modifier) {
+    val context = LocalContext.current;
     Card(modifier = modifier,
         onClick = {
             onMovieListItemClicked(movie)
@@ -56,11 +65,26 @@ fun MovieListItemCard(movie: Movie,
                 )
             }
             Column {
-                Text(
-                    text = movie.title,
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(modifier = androidx.compose.ui.Modifier.size(8.dp))
+                Row {
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    Spacer(modifier = Modifier.size(8.dp))
+
+                    IconButton(
+                        onClick = {
+                            openIMDB(context, movie.imdb_id)
+                        }) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = "IMDB Link"
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.size(8.dp))
 
                 Text(
                     text = movie.releaseDate,
@@ -78,4 +102,13 @@ fun MovieListItemCard(movie: Movie,
             }
         }
     }
+}
+
+private fun openIMDB(context: Context, id: String) {
+    //https://developer.android.com/guide/components/intents-filters
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = ("https://imdb.com/title/$id").toUri()
+    }
+    context.startActivity(Intent.createChooser(intent, "Open in IMDB"))
+
 }
