@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val windowSize = calculateWindowSizeClass(this)
 
-                    MovieDBApp(windowSize = windowSize.widthSizeClass)
+                    MovieDBApp(windowSize = windowSize)
                 }
             }
         }

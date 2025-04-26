@@ -2,10 +2,14 @@ package com.example.moviedb.ui.screens
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +20,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,21 +46,30 @@ import coil.compose.AsyncImage
 import com.example.moviedb.models.Movie
 import com.example.moviedb.utils.Constants
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.moviedb.database.Genres
 import com.example.moviedb.ui.theme.MovieDBTheme
+import com.example.moviedb.utils.MovieScreenDisplayType
 import com.example.moviedb.viewmodel.MovieListUiState
+import org.intellij.lang.annotations.JdkConstants
 
 @Composable
 fun MovieListScreen(
     movieListUiState: MovieListUiState,
+    movieScreenDisplayType: MovieScreenDisplayType,
     onMovieListItemClicked: (Movie) -> Unit,
     modifier: Modifier = Modifier) {
 
-    LazyColumn (modifier = modifier) {
+    LazyVerticalGrid (columns = if (movieScreenDisplayType == MovieScreenDisplayType.LIST)
+        GridCells.Fixed(1) else if (movieScreenDisplayType == MovieScreenDisplayType.NARROW_GRID) GridCells.Fixed(2)
+        else GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    modifier = modifier) {
         when(movieListUiState) {
             is MovieListUiState.Success -> {
-                items(movieListUiState.movies) { movie ->
+                items(movieListUiState.movies.size) {
                     MovieListItemCard(
-                        movie = movie,
+                        movie = movieListUiState.movies[it],
                         onMovieListItemClicked,
                         modifier = Modifier.padding(8.dp)
                     )
@@ -85,99 +101,63 @@ fun MovieListScreen(
 
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 fun MovieListItemCard(movie: Movie,
                       onMovieListItemClicked: (Movie) -> Unit,
                       modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val lazyRowState = rememberLazyListState(
-        initialFirstVisibleItemIndex = 1
-    )
-    LazyRow (
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        state = lazyRowState,
-        flingBehavior = rememberSnapFlingBehavior(lazyRowState)
-    ) {
-        item {
-            Card(modifier = modifier.fillParentMaxWidth(),
-                onClick = {
-                    onMovieListItemClicked(movie)
-                } )
-            {
-                Text ("Trailer Card", fontSize = 30.sp, modifier = Modifier.padding(16.dp))
-            }
-        }
-        item {
-            Card(modifier = modifier.fillParentMaxWidth(),
-                onClick = {
-                    onMovieListItemClicked(movie)
-                } )
-            {
-                Row {
-                    Box {
-                        AsyncImage(
-                            model = Constants.POSTER_IMAGE_BASE_URL + Constans.POSTER_IMAGE_BASE_WIDTH + movie.posterPath,
-                            contentDescription = movie.title,
-                            modifier = modifier
-                                .width(92.dp)
+    Card(
+        onClick = {
+            onMovieListItemClicked(movie)
+        } )
+    {
+        Row {
+            Box {
+                AsyncImage(
+                    model = Constants.POSTER_IMAGE_BASE_URL + Constants.POSTER_IMAGE_BASE_WIDTH + movie.posterPath,
+                    contentDescription = movie.title,
+                    modifier = modifier
+                        .width(92.dp)
                                 .height(138.dp),
-                            contentScale = ContentScale.Crop
-                        )
-                    }
-                    Column {
-                        Row (
-                            verticalAlignment = Alignment.Top,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ){
-                            Text(
-                                text = movie.title,
-                                style = MaterialTheme.typography.headlineSmall,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            Spacer(modifier = Modifier.size(8.dp))
-
-//                    IconButton(
-//                        onClick = {
-////                            openIMDB(context, movie.imdb_id)
-//                        }) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Info,
-//                            contentDescription = "IMDB Link"
-//                        )
-//                    }
-                }
-
-                        Spacer(modifier = Modifier.size(8.dp))
-
-                        Text(
-                            text = movie.releaseDate,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-
-                        Text(
-                            text = movie.overview,
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.size(8.dp))
-                    }
-                }
+                    contentScale = ContentScale.Crop
+                )
             }
-        }
-        item {
-            Card(modifier = modifier.fillParentMaxWidth(),
-                onClick = {
-                    onMovieListItemClicked(movie)
-                } )
-            {
-                Text ("Reviews Card", fontSize = 30.sp, modifier = Modifier.padding(16.dp))
+            Column {
+                Text(
+                    text = movie.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+
+                Spacer(modifier = Modifier.size(4.dp))
+
+                FlowRow(horizontalArrangement = Arrangement.Start) {
+                    val genres = Genres.getGenresFromIds(movie.genreIds)
+                    genres.forEach { g ->
+                        ElevatedCard (modifier = Modifier.padding(2.dp)) {
+                            Text(text = g.name, style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(horizontal = 4.dp)
+                                    .align(Alignment.CenterHorizontally))
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Text(
+                    text = movie.releaseDate,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Text(
+                    text = movie.overview,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.size(8.dp))
             }
         }
     }
-
 }
 
 private fun openIMDB(context: Context, id: String) {
@@ -199,7 +179,8 @@ fun MovieItemPreview(){
             "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
             "/gsQJOfeW45KLiQeEIsom94QPQwb.jpg",
             "2025-02-12",
-            "When a group of radical activists take over an energy company's annual gala, seizing 300 hostages, an ex-soldier turned window cleaner suspended 50 storeys up on the outside of the building must save those trapped inside, including her younger brother."
+            "When a group of radical activists take over an energy company's annual gala, seizing 300 hostages, an ex-soldier turned window cleaner suspended 50 storeys up on the outside of the building must save those trapped inside, including her younger brother.",
+            listOf(28, 53, 878)
         ),  {})
     }
 }

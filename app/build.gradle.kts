@@ -63,6 +63,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
 
+    implementation(libs.androidx.foundation.layout)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
