@@ -10,5 +10,11 @@ data class Review(
     @SerialName(value = "content")
     var content : String,
     @SerialName(value = "created_at")
-    var createdAt : String
+    var createdAt : String,
+    @SerialName(value = "id")
+    var id : String,
+    @SerialName(value = "updated_at")
+    var updated_at : String,
+    @SerialName(value = "url")
+    var url : String
 )

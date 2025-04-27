@@ -47,6 +47,7 @@ import com.example.moviedb.ui.theme.MovieDBTheme
 import com.example.moviedb.utils.AppBarType
 import com.example.moviedb.utils.MovieDetailsDisplayType
 import com.example.moviedb.utils.MovieScreenDisplayType
+import com.example.moviedb.viewmodel.SelectedMovieUiState
 
 
 enum class MovieDBScreen(@StringRes val title: Int){
@@ -178,6 +179,7 @@ fun MovieDBApp(
                         movieScreenDisplayType = movieScreenDisplayType,
                         onMovieListItemClicked = {
                             movieDBViewModel.setSelectedMovie(it)
+                            movieDBViewModel.getMoviesReview(it.id)
                             navController.navigate(MovieDBScreen.Detail.name)
                         }, modifier = Modifier.fillMaxSize().padding(16.dp)
                     )
@@ -185,6 +187,7 @@ fun MovieDBApp(
                 composable(route = MovieDBScreen.Detail.name) {
                     MovieDetailScreen(
                         selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
+                        movieReviewsUiState = movieDBViewModel.movieReviewsUIState,
                         movieDetailsDisplayType = movieDetailsDisplayType,
                         modifier = Modifier
                     )

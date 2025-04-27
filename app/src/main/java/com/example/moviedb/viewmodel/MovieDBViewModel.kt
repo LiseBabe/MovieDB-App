@@ -12,6 +12,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.moviedb.MovieDBApplication
 import com.example.moviedb.database.MoviesRepository
 import com.example.moviedb.models.Movie
+import com.example.moviedb.models.Review
 import kotlinx.coroutines.launch
 import java.io.IOException
 import retrofit2.HttpException
@@ -28,6 +29,12 @@ sealed interface SelectedMovieUiState {
     object Loading : SelectedMovieUiState
 }
 
+sealed interface MovieReviewsUiState {
+    data class Success(val reviews: List<Review>) : MovieReviewsUiState
+    object Error : MovieReviewsUiState
+    object Loading : MovieReviewsUiState
+}
+
 class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
     var movieListUiState: MovieListUiState by
     mutableStateOf(MovieListUiState.Loading)
@@ -36,6 +43,10 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
     var selectedMovieUiState: SelectedMovieUiState by
             mutableStateOf(SelectedMovieUiState.Loading)
     private set
+
+    var movieReviewsUIState: MovieReviewsUiState by
+    mutableStateOf(MovieReviewsUiState.Loading)
+        private set
 
     init {
         getPopularMovies()
@@ -67,6 +78,24 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
         }
     }
 
+    fun getMoviesReview(movieId : Long) {
+        println("Fetching reviews for movieId = $movieId")
+        viewModelScope.launch {
+            movieReviewsUIState = MovieReviewsUiState.Loading
+            movieReviewsUIState = try {
+                val result = moviesRepository.getMovieReviews(movieId)
+                println("Fetched reviews successfully: ${result.results.size} reviews")
+                MovieReviewsUiState.Success(result.results)
+            } catch (e: IOException) {
+                println("IOException: ${e.message}")
+                MovieReviewsUiState.Error
+            } catch (e: HttpException) {
+                println("HttpException: ${e.message}")
+                MovieReviewsUiState.Error
+            }
+        }
+    }
+
     fun setSelectedMovie(movie: Movie) {
         viewModelScope.launch {
             selectedMovieUiState = SelectedMovieUiState.Loading
@@ -79,6 +108,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
             }
         }
     }
+
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

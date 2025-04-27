@@ -30,21 +30,21 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.moviedb.models.Review
 import com.example.moviedb.models.Video
+import com.example.moviedb.network.MovieDBApiService
 import com.example.moviedb.utils.Constants
 import com.example.moviedb.utils.MovieDetailsDisplayType
+import com.example.moviedb.viewmodel.MovieDBViewModel
+import com.example.moviedb.viewmodel.MovieListUiState
+import com.example.moviedb.viewmodel.MovieReviewsUiState
 import com.example.moviedb.viewmodel.SelectedMovieUiState
 
 @Composable
 fun MovieDetailScreen(
     selectedMovieUiState: SelectedMovieUiState,
+    movieReviewsUiState: MovieReviewsUiState,
     movieDetailsDisplayType: MovieDetailsDisplayType,
     modifier: Modifier = Modifier
 ) {
-    //Temporary variables until api calls can replace them
-    val reviews : List<Review> = listOf(
-        Review("steve", "really good movie", "10/10/2010"),
-        Review("john", "really bad movie", "10/10/2010"),
-        Review("jeremy", "it was okay", "10/10/2010"))
     val videos : List<Video> = listOf(Video("test", "test", "test", 1, "test", true, "10/10/2021"))
 
     when (selectedMovieUiState) {
@@ -54,7 +54,35 @@ fun MovieDetailScreen(
                     Column (modifier){
                         MovieImageElement(selectedMovieUiState, modifier)
                         MovieDescriptionElement(selectedMovieUiState, modifier)
-                        ReviewAndVideoRow(movieDetailsDisplayType, videos, reviews, modifier)
+                        when (movieReviewsUiState) {
+                            is MovieReviewsUiState.Success -> {
+                                ReviewAndVideoRow(
+                                    movieDetailsDisplayType,
+                                    videos,
+                                    movieReviewsUiState.reviews,
+                                    modifier
+                                )
+                            }
+                            is MovieReviewsUiState.Loading -> {
+                                Card (modifier = Modifier.fillMaxWidth(0.35f)) {
+                                    Text(
+                                        text = "Loading reviews...",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
+                            }
+                            is MovieReviewsUiState.Error -> {
+                                Card (modifier = Modifier.fillMaxWidth(0.35f)) {
+                                    Text(
+                                        text = "Error: Something went wrong!",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(16.dp)
+                                    )
+                                }
+                            }
+                        }
+                        // ReviewAndVideoRow(movieDetailsDisplayType, videos, reviews, modifier)
                     }
                 }
                 MovieDetailsDisplayType.WIDE -> {
@@ -70,7 +98,25 @@ fun MovieDetailScreen(
                             }
                         }
                         item {
-                            ReviewAndVideoRow(movieDetailsDisplayType, videos, reviews, modifier)
+                            when (movieReviewsUiState) {
+                                is MovieReviewsUiState.Success -> {
+                                    ReviewAndVideoRow(
+                                        movieDetailsDisplayType,
+                                        videos,
+                                        movieReviewsUiState.reviews,
+                                        modifier
+                                    )
+                                }
+                                is MovieReviewsUiState.Loading -> {
+                                    // Show a loading spinner or a placeholder
+                                    Text("to be done")
+                                }
+                                is MovieReviewsUiState.Error -> {
+                                    // Show an error message
+                                    Text("to be done")
+                                }
+                            }
+                            //ReviewAndVideoRow(movieDetailsDisplayType, videos, reviews, modifier)
                         }
                     }
                 }
