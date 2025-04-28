@@ -227,8 +227,7 @@ fun ReviewAndVideoRow(movieDetailsDisplayType: MovieDetailsDisplayType,
             items(reviews.size) {
                 MovieDetailReviewCard(
                     reviews[it],
-                    fillMaxWidth = movieDetailsDisplayType == MovieDetailsDisplayType.TALL,
-                    modifier.fillParentMaxWidth(),
+                    modifier = if (movieDetailsDisplayType == MovieDetailsDisplayType.TALL) modifier.fillParentMaxWidth() else modifier.fillParentMaxWidth(0.5f),
                 )
             }
         }
@@ -236,8 +235,8 @@ fun ReviewAndVideoRow(movieDetailsDisplayType: MovieDetailsDisplayType,
 }
 
 @Composable
-fun MovieDetailReviewCard(review: Review, fillMaxWidth: Boolean, modifier: Modifier = Modifier) {
-    Card (modifier = if (fillMaxWidth) modifier else Modifier.fillMaxWidth(0.35f)) {
+fun MovieDetailReviewCard(review: Review, modifier: Modifier = Modifier) {
+    Card (modifier = modifier) {
         Column (modifier = Modifier.padding(16.dp)){
             Text(text = review.author, style = MaterialTheme.typography.headlineMedium)
 
