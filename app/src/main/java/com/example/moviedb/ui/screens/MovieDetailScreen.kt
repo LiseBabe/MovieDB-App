@@ -49,6 +49,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun MovieDetailScreen(
@@ -64,7 +67,9 @@ fun MovieDetailScreen(
         is SelectedMovieUiState.Success -> {
             when (movieDetailsDisplayType) {
                 MovieDetailsDisplayType.TALL -> {
-                    Column (modifier){
+                    Column (
+                        modifier.verticalScroll(rememberScrollState())
+                    ){
                         MovieImageElement(selectedMovieUiState, modifier)
                         MovieDescriptionElement(selectedMovieUiState, modifier)
                         when (movieReviewsUiState) {
@@ -101,7 +106,7 @@ fun MovieDetailScreen(
                 MovieDetailsDisplayType.WIDE -> {
                     LazyColumn {
                         item {
-                            Row (modifier = Modifier.fillMaxWidth().height(250.dp)){
+                            Row (modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)){
                                 MovieImageElement(selectedMovieUiState, modifier)
                                 Spacer(modifier = Modifier.size(8.dp))
                                 MovieDescriptionElement(
@@ -249,11 +254,32 @@ fun MovieDetailReviewCard(review: Review, fillMaxWidth: Boolean, modifier: Modif
 
 @Composable
 fun MovieDetailVideoCard(video: Video, fillMaxWidth: Boolean, modifier: Modifier = Modifier) {
-    Card (modifier = if (fillMaxWidth) modifier .fillMaxSize()
-        .aspectRatio(16/9f)
-        else Modifier
-        .fillMaxWidth(0.35f)
-        .aspectRatio(16/9f)) {
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val screenWidth = configuration.screenWidthDp.dp
+
+    // Detect orientation
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    // Set dynamic height
+    val videoHeight = if (isLandscape) {
+        screenHeight * 0.8f // 80% of the screen height
+    } else {
+        220.dp // Normal height in portrait
+    }
+
+    Card (
+        modifier = if (fillMaxWidth) {
+            modifier
+                .fillMaxWidth()
+                .height(videoHeight)
+        } else {
+            modifier
+                .fillMaxWidth(0.35f)
+                .height(videoHeight)
+        }
+    ) {
         val context = LocalContext.current
 
         val exoPlayer = remember {
@@ -283,7 +309,7 @@ fun MovieDetailVideoCard(video: Video, fillMaxWidth: Boolean, modifier: Modifier
                     )
                 }
             },
-            modifier = if (fillMaxWidth) modifier.fillMaxSize() else Modifier.fillMaxWidth(0.35f)
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
