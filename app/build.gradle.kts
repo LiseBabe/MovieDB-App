@@ -63,6 +63,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.logging.interceptor)
 
+    // ExoPlayer (nouvelle version Media3)
+    implementation ("androidx.media3:media3-exoplayer:1.3.1")
+    implementation ("androidx.media3:media3-ui:1.3.1")
+
     implementation(libs.androidx.foundation.layout)
 
     testImplementation(libs.junit)

@@ -13,6 +13,7 @@ import com.example.moviedb.MovieDBApplication
 import com.example.moviedb.database.MoviesRepository
 import com.example.moviedb.models.Movie
 import com.example.moviedb.models.Review
+import com.example.moviedb.models.Video
 import kotlinx.coroutines.launch
 import java.io.IOException
 import retrofit2.HttpException
@@ -35,6 +36,12 @@ sealed interface MovieReviewsUiState {
     object Loading : MovieReviewsUiState
 }
 
+sealed interface MovieVideosUiState {
+    data class Success(val videos: List<Video>) : MovieVideosUiState
+    object Error : MovieVideosUiState
+    object Loading : MovieVideosUiState
+}
+
 class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewModel() {
     var movieListUiState: MovieListUiState by
     mutableStateOf(MovieListUiState.Loading)
@@ -46,6 +53,10 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
 
     var movieReviewsUIState: MovieReviewsUiState by
     mutableStateOf(MovieReviewsUiState.Loading)
+        private set
+
+    var movieVideosUiState: MovieVideosUiState by
+    mutableStateOf(MovieVideosUiState.Loading)
         private set
 
     init {
@@ -95,6 +106,25 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository) : ViewMod
             }
         }
     }
+
+    fun getMovieVideos(movieId: Long) {
+        println("Fetching videos for movieId = $movieId")
+        viewModelScope.launch {
+            movieVideosUiState = MovieVideosUiState.Loading
+            movieVideosUiState = try {
+                val result = moviesRepository.getMovieVideos(movieId)
+                println("Fetched videos successfully: ${result.videos.size} videos")
+                MovieVideosUiState.Success(result.videos)
+            } catch (e: IOException) {
+                println("IOException: ${e.message}")
+                MovieVideosUiState.Error
+            } catch (e: HttpException) {
+                println("HttpException: ${e.message}")
+                MovieVideosUiState.Error
+            }
+        }
+    }
+
 
     fun setSelectedMovie(movie: Movie) {
         viewModelScope.launch {

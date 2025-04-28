@@ -36,12 +36,25 @@ import com.example.moviedb.utils.MovieDetailsDisplayType
 import com.example.moviedb.viewmodel.MovieDBViewModel
 import com.example.moviedb.viewmodel.MovieListUiState
 import com.example.moviedb.viewmodel.MovieReviewsUiState
+import com.example.moviedb.viewmodel.MovieVideosUiState
 import com.example.moviedb.viewmodel.SelectedMovieUiState
+import android.content.Context
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 
 @Composable
 fun MovieDetailScreen(
     selectedMovieUiState: SelectedMovieUiState,
     movieReviewsUiState: MovieReviewsUiState,
+    movieVideosUiState: MovieVideosUiState,
     movieDetailsDisplayType: MovieDetailsDisplayType,
     modifier: Modifier = Modifier
 ) {
@@ -97,6 +110,7 @@ fun MovieDetailScreen(
                                 )
                             }
                         }
+
                         item {
                             when (movieReviewsUiState) {
                                 is MovieReviewsUiState.Success -> {
@@ -116,7 +130,6 @@ fun MovieDetailScreen(
                                     Text("to be done")
                                 }
                             }
-                            //ReviewAndVideoRow(movieDetailsDisplayType, videos, reviews, modifier)
                         }
                     }
                 }
@@ -236,7 +249,41 @@ fun MovieDetailReviewCard(review: Review, fillMaxWidth: Boolean, modifier: Modif
 
 @Composable
 fun MovieDetailVideoCard(video: Video, fillMaxWidth: Boolean, modifier: Modifier = Modifier) {
-    Card (modifier = if (fillMaxWidth) modifier else Modifier.fillMaxWidth(0.35f)) {
-        Text (text = "Not yet implemented.")
+    Card (modifier = if (fillMaxWidth) modifier .fillMaxSize()
+        .aspectRatio(16/9f)
+        else Modifier
+        .fillMaxWidth(0.35f)
+        .aspectRatio(16/9f)) {
+        val context = LocalContext.current
+
+        val exoPlayer = remember {
+            ExoPlayer.Builder(context).build().apply {
+                // Fix video for the moment
+                val mediaItem = MediaItem.fromUri("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+                setMediaItem(mediaItem)
+                prepare()
+                playWhenReady = false
+            }
+        }
+
+        DisposableEffect(Unit) {
+            onDispose {
+                exoPlayer.release()
+            }
+        }
+
+        AndroidView(
+            factory = {
+                PlayerView(it).apply {
+                    player = exoPlayer
+                    useController = true
+                    layoutParams = android.view.ViewGroup.LayoutParams(
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                        android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                }
+            },
+            modifier = if (fillMaxWidth) modifier.fillMaxSize() else Modifier.fillMaxWidth(0.35f)
+        )
     }
 }

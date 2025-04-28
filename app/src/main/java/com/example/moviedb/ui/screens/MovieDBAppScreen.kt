@@ -47,6 +47,7 @@ import com.example.moviedb.ui.theme.MovieDBTheme
 import com.example.moviedb.utils.AppBarType
 import com.example.moviedb.utils.MovieDetailsDisplayType
 import com.example.moviedb.utils.MovieScreenDisplayType
+import com.example.moviedb.viewmodel.MovieVideosUiState
 import com.example.moviedb.viewmodel.SelectedMovieUiState
 
 
@@ -188,6 +189,7 @@ fun MovieDBApp(
                     MovieDetailScreen(
                         selectedMovieUiState = movieDBViewModel.selectedMovieUiState,
                         movieReviewsUiState = movieDBViewModel.movieReviewsUIState,
+                        movieVideosUiState = MovieVideosUiState.Loading,
                         movieDetailsDisplayType = movieDetailsDisplayType,
                         modifier = Modifier
                     )
