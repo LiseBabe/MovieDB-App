@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
@@ -59,11 +62,11 @@ fun MovieListScreen(
     onMovieListItemClicked: (Movie) -> Unit,
     modifier: Modifier = Modifier) {
 
-    LazyVerticalGrid (columns = if (movieScreenDisplayType == MovieScreenDisplayType.LIST)
-        GridCells.Fixed(1) else if (movieScreenDisplayType == MovieScreenDisplayType.NARROW_GRID) GridCells.Fixed(2)
-        else GridCells.Fixed(3),
+    LazyVerticalStaggeredGrid (columns = if (movieScreenDisplayType == MovieScreenDisplayType.LIST)
+        StaggeredGridCells.Fixed(1) else if (movieScreenDisplayType == MovieScreenDisplayType.NARROW_GRID) StaggeredGridCells.Fixed(2)
+        else StaggeredGridCells.Fixed(3),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalItemSpacing = 8.dp,
     modifier = modifier) {
         when(movieListUiState) {
             is MovieListUiState.Success -> {
@@ -71,7 +74,8 @@ fun MovieListScreen(
                     MovieListItemCard(
                         movie = movieListUiState.movies[it],
                         onMovieListItemClicked,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier
+                            .padding(8.dp)
                     )
                 }
             }
@@ -117,7 +121,7 @@ fun MovieListItemCard(movie: Movie,
                     contentDescription = movie.title,
                     modifier = modifier
                         .width(92.dp)
-                                .height(138.dp),
+                        .height(138.dp),
                     contentScale = ContentScale.Crop
                 )
             }
