@@ -163,7 +163,7 @@ fun MovieImageElement(selectedMovieUiState : SelectedMovieUiState.Success, modif
         modifier.height(250.dp).padding(0.dp)
     ) {
         AsyncImage(
-            model = Constants.BACKDROP_IMAGE_BASE_URL + Constants.BACKDROP_IMAGE_BASE_WIDTH + selectedMovieUiState.movie.backdropPath,
+            model = Constants.BACKDROP_IMAGE_BASE_URL + Constants.BACKDROP_IMAGE_BASE_WIDTH + (selectedMovieUiState.movie.backdropPath ?: ""),
             contentDescription = selectedMovieUiState.movie.title,
             modifier = modifier,
             contentScale = ContentScale.Crop
