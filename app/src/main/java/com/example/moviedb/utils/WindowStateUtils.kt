@@ -11,3 +11,7 @@ enum class AppBarType {
 enum class MovieDetailsDisplayType {
     TALL, WIDE
 }
+
+enum class MovieListScreens {
+    POPULAR, TOP_RATED, SAVED
+}

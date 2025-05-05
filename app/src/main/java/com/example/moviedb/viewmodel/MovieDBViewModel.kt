@@ -16,6 +16,7 @@ import com.example.moviedb.database.SavedMoviesRepository
 import com.example.moviedb.models.Movie
 import com.example.moviedb.models.Review
 import com.example.moviedb.models.Video
+import com.example.moviedb.utils.MovieListScreens
 import kotlinx.coroutines.launch
 import java.io.IOException
 import retrofit2.HttpException
@@ -61,6 +62,8 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
     var movieVideosUiState: MovieVideosUiState by
     mutableStateOf(MovieVideosUiState.Loading)
         private set
+
+    var currentMovieList : MovieListScreens = MovieListScreens.POPULAR
 
     init {
         getPopularMovies()
@@ -165,7 +168,8 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
     fun deleteMovie(movie: Movie) {
         viewModelScope.launch {
             savedMoviesRepository.deleteMovie(movie)
-            selectedMovieUiState = SelectedMovieUiState.Success(movie, true)
+            selectedMovieUiState = SelectedMovieUiState.Success(movie, false)
+            if (currentMovieList == MovieListScreens.SAVED) getSavedMovies()
         }
     }
 
