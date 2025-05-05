@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.moviedb.models.Movie
+import com.example.moviedb.utils.MovieCacheType
 
 class Converters {
     @TypeConverter
@@ -19,9 +20,19 @@ class Converters {
     fun toIntList(value: String?): List<Int>? {
         return value?.split(",")?.map { it.toInt() }
     }
+
+    @TypeConverter
+    fun enumToInt(type: MovieCacheType): Int {
+        return type.ordinal
+    }
+
+    @TypeConverter
+    fun intToEnum(int: Int): MovieCacheType {
+        return if(int == 0) MovieCacheType.REGULAR else MovieCacheType.FAVORITE
+    }
 }
 
-@Database(entities = [Movie::class], version = 1, exportSchema = false)
+@Database(entities = [Movie::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDataAccessObject

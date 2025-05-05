@@ -1,8 +1,14 @@
 package com.example.moviedb.viewmodel
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat.getSystemService
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +22,8 @@ import com.example.moviedb.database.SavedMoviesRepository
 import com.example.moviedb.models.Movie
 import com.example.moviedb.models.Review
 import com.example.moviedb.models.Video
+import com.example.moviedb.network.NetworkManager
+import com.example.moviedb.utils.MovieCacheType
 import com.example.moviedb.utils.MovieListScreens
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -46,7 +54,8 @@ sealed interface MovieVideosUiState {
 }
 
 class MovieDBViewModel(private val moviesRepository: MoviesRepository,
-    private val savedMoviesRepository: SavedMoviesRepository) : ViewModel() {
+    val savedMoviesRepository: SavedMoviesRepository,
+    val networkManager: NetworkManager) : ViewModel() {
     var movieListUiState: MovieListUiState by
     mutableStateOf(MovieListUiState.Loading)
         private set
@@ -70,23 +79,35 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
     }
 
     fun getTopRatedMovies() {
-        viewModelScope.launch {
-            movieListUiState = MovieListUiState.Loading
-            movieListUiState = try {
-                MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
-            } catch (e: IOException) {
-                MovieListUiState.Error
-            } catch (e: HttpException) {
-                MovieListUiState.Error
+            viewModelScope.launch {
+                movieListUiState = MovieListUiState.Loading
+                movieListUiState = try {
+                    if( networkManager.hasInternet) {
+                        MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
+                    } else if(currentMovieList == MovieListScreens.TOP_RATED){
+                        MovieListUiState.Success(savedMoviesRepository.getSavedMovies(MovieCacheType.REGULAR))
+                    } else {
+                        MovieListUiState.Error
+                    }
+                } catch (e: IOException) {
+                    MovieListUiState.Error
+                } catch (e: HttpException) {
+                    MovieListUiState.Error
+                }
             }
-        }
     }
 
     fun getPopularMovies() {
         viewModelScope.launch {
             movieListUiState = MovieListUiState.Loading
             movieListUiState = try {
-                MovieListUiState.Success(moviesRepository.getPopularMovies().results)
+                if( networkManager.hasInternet) {
+                    MovieListUiState.Success(moviesRepository.getPopularMovies().results)
+                } else if(currentMovieList == MovieListScreens.POPULAR){
+                    MovieListUiState.Success(savedMoviesRepository.getSavedMovies(MovieCacheType.REGULAR))
+                } else {
+                    MovieListUiState.Error
+                }
             } catch (e: IOException) {
                 MovieListUiState.Error
             } catch (e: HttpException) {
@@ -96,18 +117,14 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
     }
 
     fun getMoviesReview(movieId : Long) {
-        println("Fetching reviews for movieId = $movieId")
         viewModelScope.launch {
             movieReviewsUIState = MovieReviewsUiState.Loading
             movieReviewsUIState = try {
                 val result = moviesRepository.getMovieReviews(movieId)
-                println("Fetched reviews successfully: ${result.results.size} reviews")
                 MovieReviewsUiState.Success(result.results)
             } catch (e: IOException) {
-                println("IOException: ${e.message}")
                 MovieReviewsUiState.Error
             } catch (e: HttpException) {
-                println("HttpException: ${e.message}")
                 MovieReviewsUiState.Error
             }
         }
@@ -136,7 +153,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
         viewModelScope.launch {
             selectedMovieUiState = SelectedMovieUiState.Loading
             selectedMovieUiState = try {
-                SelectedMovieUiState.Success(movie, savedMoviesRepository.getMovie(movie.id) != null)
+                SelectedMovieUiState.Success(movie, (savedMoviesRepository.getMovie(movie.id)?.cacheType == MovieCacheType.FAVORITE) ?: false)
             } catch (e: IOException) {
                 SelectedMovieUiState.Error
             } catch (e: HttpException) {
@@ -149,7 +166,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
         viewModelScope.launch {
             movieListUiState = MovieListUiState.Loading
             movieListUiState = try {
-                MovieListUiState.Success(savedMoviesRepository.getSavedMovies())
+                MovieListUiState.Success(savedMoviesRepository.getSavedMovies(MovieCacheType.FAVORITE))
             } catch (e: IOException) {
                 MovieListUiState.Error
             } catch (e: HttpException) {
@@ -160,6 +177,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
 
     fun saveMovie(movie: Movie) {
         viewModelScope.launch {
+            movie.cacheType = MovieCacheType.FAVORITE
             savedMoviesRepository.insertMovie(movie)
             selectedMovieUiState = SelectedMovieUiState.Success(movie, true)
         }
@@ -173,14 +191,29 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
         }
     }
 
+    fun onInternetReconnect() {
+        when (currentMovieList) {
+            MovieListScreens.POPULAR -> getPopularMovies()
+            MovieListScreens.TOP_RATED -> getTopRatedMovies()
+            MovieListScreens.SAVED -> getSavedMovies()
+        }
+    }
+
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MovieDBApplication)
-                val moviesRepository = application.container.moviesRepository
-                val savedMoviesRepository = application.container.savedMoviesRepository
-                MovieDBViewModel(moviesRepository = moviesRepository, savedMoviesRepository = savedMoviesRepository)
+        val Factory = { networkManager: NetworkManager ->
+            viewModelFactory {
+                initializer {
+                    val application =
+                        (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MovieDBApplication)
+                    val moviesRepository = application.container.moviesRepository
+                    val savedMoviesRepository = application.container.savedMoviesRepository
+                    MovieDBViewModel(
+                        moviesRepository = moviesRepository,
+                        savedMoviesRepository = savedMoviesRepository,
+                        networkManager = networkManager
+                    )
+                }
             }
         }
     }

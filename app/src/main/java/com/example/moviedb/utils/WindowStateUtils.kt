@@ -15,3 +15,7 @@ enum class MovieDetailsDisplayType {
 enum class MovieListScreens {
     POPULAR, TOP_RATED, SAVED
 }
+
+enum class MovieCacheType {
+    REGULAR, FAVORITE
+}

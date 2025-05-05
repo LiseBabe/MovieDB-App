@@ -51,13 +51,15 @@ import com.example.moviedb.utils.Constants
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moviedb.database.Genres
 import com.example.moviedb.ui.theme.MovieDBTheme
+import com.example.moviedb.utils.MovieCacheType
 import com.example.moviedb.utils.MovieScreenDisplayType
+import com.example.moviedb.viewmodel.MovieDBViewModel
 import com.example.moviedb.viewmodel.MovieListUiState
 import org.intellij.lang.annotations.JdkConstants
 
 @Composable
 fun MovieListScreen(
-    movieListUiState: MovieListUiState,
+    movieDBViewModel: MovieDBViewModel,
     movieScreenDisplayType: MovieScreenDisplayType,
     onMovieListItemClicked: (Movie) -> Unit,
     modifier: Modifier = Modifier) {
@@ -68,8 +70,19 @@ fun MovieListScreen(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalItemSpacing = 8.dp,
     modifier = modifier) {
+        val movieListUiState = movieDBViewModel.movieListUiState
+        val savedMoviesRepository = movieDBViewModel.savedMoviesRepository
         when(movieListUiState) {
             is MovieListUiState.Success -> {
+                item {
+                    LaunchedEffect(true) {
+                        if(movieDBViewModel.networkManager.hasInternet) {
+                            savedMoviesRepository.deleteAllMovies(MovieCacheType.REGULAR)
+                            savedMoviesRepository.insertMovies(movieListUiState.movies)
+                        }
+                    }
+                }
+
                 items(movieListUiState.movies.size) {
                     MovieListItemCard(
                         movie = movieListUiState.movies[it],

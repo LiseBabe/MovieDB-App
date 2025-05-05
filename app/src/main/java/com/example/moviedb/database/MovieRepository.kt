@@ -5,6 +5,7 @@ import com.example.moviedb.models.MovieResponse
 import com.example.moviedb.models.ReviewResponse
 import com.example.moviedb.models.VideoResponse
 import com.example.moviedb.network.MovieDBApiService
+import com.example.moviedb.utils.MovieCacheType
 
 interface MoviesRepository {
     suspend fun getPopularMovies(): MovieResponse
@@ -32,15 +33,17 @@ class NetworkMoviesRepository(private val apiService: MovieDBApiService) : Movie
 }
 
 interface SavedMoviesRepository{
-    suspend fun getSavedMovies(): List<Movie>
+    suspend fun getSavedMovies(type: MovieCacheType): List<Movie>
     suspend fun insertMovie(movie: Movie)
     suspend fun getMovie(id: Long): Movie
     suspend fun deleteMovie(movie: Movie)
+    suspend fun deleteAllMovies(type: MovieCacheType)
+    suspend fun insertMovies(list: List<Movie>)
 }
 
-class FavoriteMoviesRepository(private val movieDAO: MovieDataAccessObject): SavedMoviesRepository{
-    override suspend fun getSavedMovies(): List<Movie> {
-        return movieDAO.getSavedMovies()
+class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject): SavedMoviesRepository{
+    override suspend fun getSavedMovies(type: MovieCacheType): List<Movie> {
+        return movieDAO.getSavedMovies(type.ordinal)
     }
 
     override suspend fun insertMovie(movie: Movie) {
@@ -53,6 +56,16 @@ class FavoriteMoviesRepository(private val movieDAO: MovieDataAccessObject): Sav
 
     override suspend fun deleteMovie(movie: Movie) {
         movieDAO.deleteMovie(movie.id)
+    }
+
+    override suspend fun deleteAllMovies(type: MovieCacheType) {
+        movieDAO.deleteAllMovies(type.ordinal)
+    }
+
+    override suspend fun insertMovies(list: List<Movie>) {
+        for (item in list) {
+            movieDAO.insertMovie(item)
+        }
     }
 
 }

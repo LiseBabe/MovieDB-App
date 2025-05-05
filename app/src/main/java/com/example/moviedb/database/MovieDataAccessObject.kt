@@ -8,15 +8,18 @@ import com.example.moviedb.models.Movie
 
 @Dao
 interface MovieDataAccessObject {
-    @Query("SELECT * FROM favorite_movies")
-    suspend fun getSavedMovies(): List<Movie>
+    @Query("SELECT * FROM movies WHERE cacheType = :type")
+    suspend fun getSavedMovies(type: Int): List<Movie>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMovie(movie: Movie)
 
-    @Query("SELECT * FROM favorite_movies WHERE id = :id")
+    @Query("SELECT * FROM movies WHERE id = :id AND cacheType = 1")
     suspend fun getMovie(id: Long): Movie
 
-    @Query("DELETE FROM favorite_movies WHERE id = :id")
+    @Query("DELETE FROM movies WHERE id = :id AND cacheType = 1")
     suspend fun deleteMovie(id: Long)
+
+    @Query("DELETE FROM movies WHERE cacheType = :type")
+    suspend fun deleteAllMovies(type: Int)
 }

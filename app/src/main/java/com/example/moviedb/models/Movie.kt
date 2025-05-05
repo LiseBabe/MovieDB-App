@@ -3,11 +3,14 @@ package com.example.moviedb.models
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
+import com.example.moviedb.utils.MovieCacheType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
+
 @Serializable
-@Entity(tableName = "favorite_movies")
+@Entity(tableName = "movies")
 data class Movie(
     @PrimaryKey
     @SerialName(value = "id")
@@ -23,5 +26,6 @@ data class Movie(
     @SerialName(value = "overview")
     var overview: String,
     @SerialName(value = "genre_ids")
-    var genreIds: List<Int>
+    var genreIds: List<Int>,
+    var cacheType: MovieCacheType = MovieCacheType.REGULAR
 )

@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moviedb.R
 import com.example.moviedb.database.Movies
 import com.example.moviedb.models.Movie
+import com.example.moviedb.network.NetworkManager
 import com.example.moviedb.ui.screens.MovieListItemCard
 import com.example.moviedb.ui.screens.MovieListScreen
 import com.example.moviedb.viewmodel.MovieDBViewModel
@@ -206,8 +208,11 @@ fun MovieDBApp(
             movieScreenDisplayType = MovieScreenDisplayType.NARROW_GRID
         }
     }
+    val context = LocalContext.current
+    val networkManager = remember { NetworkManager(context) }
     val movieDBViewModel: MovieDBViewModel = viewModel(factory =
-        MovieDBViewModel.Factory)
+        MovieDBViewModel.Factory(networkManager))
+    networkManager.onInternetReconnect = { movieDBViewModel.onInternetReconnect() }
 
     Scaffold(
         topBar = {
@@ -237,7 +242,7 @@ fun MovieDBApp(
             ) {
                 composable(route = MovieDBScreen.List.name) {
                     MovieListScreen(
-                        movieListUiState = movieDBViewModel.movieListUiState,
+                        movieDBViewModel = movieDBViewModel,
                         movieScreenDisplayType = movieScreenDisplayType,
                         onMovieListItemClicked = {
                             movieDBViewModel.setSelectedMovie(it)
