@@ -1,5 +1,9 @@
 package com.example.moviedb.database
 
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.example.moviedb.models.CacheMovie
 import com.example.moviedb.models.Movie
 import com.example.moviedb.models.MovieResponse
 import com.example.moviedb.models.ReviewResponse
@@ -33,17 +37,19 @@ class NetworkMoviesRepository(private val apiService: MovieDBApiService) : Movie
 }
 
 interface SavedMoviesRepository{
-    suspend fun getSavedMovies(type: MovieCacheType): List<Movie>
+    suspend fun getSavedMovies(): List<Movie>
     suspend fun insertMovie(movie: Movie)
     suspend fun getMovie(id: Long): Movie
     suspend fun deleteMovie(movie: Movie)
-    suspend fun deleteAllMovies(type: MovieCacheType)
+    suspend fun deleteAllMovies()
     suspend fun insertMovies(list: List<Movie>)
+    suspend fun getCacheMovies(): List<Movie>
+    suspend fun insertCacheMovie(cacheMovie: List<CacheMovie>)
 }
 
 class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject): SavedMoviesRepository{
-    override suspend fun getSavedMovies(type: MovieCacheType): List<Movie> {
-        return movieDAO.getSavedMovies(type.ordinal)
+    override suspend fun getSavedMovies(): List<Movie> {
+        return movieDAO.getSavedMovies()
     }
 
     override suspend fun insertMovie(movie: Movie) {
@@ -58,14 +64,23 @@ class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject): Saved
         movieDAO.deleteMovie(movie.id)
     }
 
-    override suspend fun deleteAllMovies(type: MovieCacheType) {
-        movieDAO.deleteAllMovies(type.ordinal)
-    }
-
     override suspend fun insertMovies(list: List<Movie>) {
         for (item in list) {
             movieDAO.insertMovie(item)
         }
+    }
+
+    override suspend fun getCacheMovies() : List<Movie>{
+        return movieDAO.getCacheMovies()
+    }
+
+
+    override suspend fun insertCacheMovie(cacheMovie : List<CacheMovie>){
+        movieDAO.insertCacheMovie(cacheMovie)
+    }
+
+    override suspend fun deleteAllMovies() {
+        movieDAO.deleteAllMovies()
     }
 
 }

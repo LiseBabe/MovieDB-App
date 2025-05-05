@@ -7,6 +7,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.moviedb.models.CacheMovie
 import com.example.moviedb.models.Movie
 import com.example.moviedb.utils.MovieCacheType
 
@@ -32,7 +33,7 @@ class Converters {
     }
 }
 
-@Database(entities = [Movie::class], version = 2, exportSchema = false)
+@Database(entities = [Movie::class, CacheMovie::class], version = 3, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDataAccessObject

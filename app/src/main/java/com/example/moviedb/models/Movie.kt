@@ -10,22 +10,46 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-@Entity(tableName = "movies")
-data class Movie(
+@Entity(tableName = "favorite_movies")
+open class Movie(
     @PrimaryKey
     @SerialName(value = "id")
-    var id: Long = 0L,
+    open var id: Long = 0L,
     @SerialName(value = "title")
-    var title: String,
+    open var title: String,
     @SerialName(value = "poster_path")
-    var posterPath: String,
+    open var posterPath: String,
     @SerialName(value = "backdrop_path")
-    var backdropPath: String?,
+    open var backdropPath: String?,
     @SerialName(value = "release_date")
-    var releaseDate: String,
+    open var releaseDate: String,
     @SerialName(value = "overview")
-    var overview: String,
+    open var overview: String,
     @SerialName(value = "genre_ids")
-    var genreIds: List<Int>,
-    var cacheType: MovieCacheType = MovieCacheType.REGULAR
+    open var genreIds: List<Int>
+)
+
+@Entity(tableName = "cache_movies")
+class CacheMovie (@PrimaryKey
+                      @SerialName(value = "id")
+                  override var id: Long = 0L,
+                  @SerialName(value = "title")
+                  override var title: String,
+                  @SerialName(value = "poster_path")
+                  override var posterPath: String,
+                  @SerialName(value = "backdrop_path")
+                  override var backdropPath: String?,
+                  @SerialName(value = "release_date")
+                  override var releaseDate: String,
+                  @SerialName(value = "overview")
+                  override var overview: String,
+                  @SerialName(value = "genre_ids")
+                  override var genreIds: List<Int>) : Movie (
+    id = id,
+    title = title,
+    posterPath = posterPath,
+    backdropPath = backdropPath,
+    releaseDate = releaseDate,
+    overview = overview,
+    genreIds = genreIds
 )

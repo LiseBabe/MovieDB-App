@@ -50,6 +50,7 @@ import com.example.moviedb.models.Movie
 import com.example.moviedb.utils.Constants
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.moviedb.database.Genres
+import com.example.moviedb.models.CacheMovie
 import com.example.moviedb.ui.theme.MovieDBTheme
 import com.example.moviedb.utils.MovieCacheType
 import com.example.moviedb.utils.MovieScreenDisplayType
@@ -77,8 +78,9 @@ fun MovieListScreen(
                 item {
                     LaunchedEffect(true) {
                         if(movieDBViewModel.networkManager.hasInternet) {
-                            savedMoviesRepository.deleteAllMovies(MovieCacheType.REGULAR)
-                            savedMoviesRepository.insertMovies(movieListUiState.movies)
+                            movieDBViewModel.lastCacheList = movieDBViewModel.currentMovieList
+                            savedMoviesRepository.deleteAllMovies()
+                            savedMoviesRepository.insertMovies(movieListUiState.movies as List<CacheMovie>)
                         }
                     }
                 }
