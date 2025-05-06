@@ -20,9 +20,12 @@ interface MovieDataAccessObject {
 
     @Query("DELETE FROM favorite_movies WHERE id = :id")
     suspend fun deleteMovie(id: Long)
+}
 
+@Dao
+interface CacheMovieDataAccessObject {
     @Query("SELECT * FROM cache_movies")
-    suspend fun getCacheMovies(): List<Movie>
+    suspend fun getCacheMovies(): List<CacheMovie>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCacheMovie(cacheMovie : List<CacheMovie>)
@@ -30,4 +33,3 @@ interface MovieDataAccessObject {
     @Query("DELETE FROM cache_movies WHERE id != null")
     suspend fun deleteAllMovies()
 }
-

@@ -47,6 +47,6 @@ class DefaultAppContainer (private val context : Context): AppContainer {
     }
 
     override val savedMoviesRepository: SavedMoviesRepository by lazy {
-        CachedMoviesRepository(MovieDatabase.getDatabase(context).movieDao())
+        CachedMoviesRepository(MovieDatabase.getDatabase(context).movieDao(),MovieDatabase.getDatabase(context).cacheMovieDao() )
     }
 }

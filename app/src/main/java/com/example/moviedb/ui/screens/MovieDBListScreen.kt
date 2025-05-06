@@ -80,7 +80,7 @@ fun MovieListScreen(
                         if(movieDBViewModel.networkManager.hasInternet) {
                             movieDBViewModel.lastCacheList = movieDBViewModel.currentMovieList
                             savedMoviesRepository.deleteAllMovies()
-                            savedMoviesRepository.insertMovies(movieListUiState.movies as List<CacheMovie>)
+                            savedMoviesRepository.insertCacheMovie(movieListUiState.movies)
                         }
                     }
                 }

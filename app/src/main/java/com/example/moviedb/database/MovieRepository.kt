@@ -42,12 +42,11 @@ interface SavedMoviesRepository{
     suspend fun getMovie(id: Long): Movie
     suspend fun deleteMovie(movie: Movie)
     suspend fun deleteAllMovies()
-    suspend fun insertMovies(list: List<Movie>)
-    suspend fun getCacheMovies(): List<Movie>
-    suspend fun insertCacheMovie(cacheMovie: List<CacheMovie>)
+    suspend fun getCacheMovies(): List<CacheMovie>
+    suspend fun insertCacheMovie(cacheMovie: List<Movie>)
 }
 
-class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject): SavedMoviesRepository{
+class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject, private val cacheMovieDAO: CacheMovieDataAccessObject): SavedMoviesRepository{
     override suspend fun getSavedMovies(): List<Movie> {
         return movieDAO.getSavedMovies()
     }
@@ -64,23 +63,27 @@ class CachedMoviesRepository(private val movieDAO: MovieDataAccessObject): Saved
         movieDAO.deleteMovie(movie.id)
     }
 
-    override suspend fun insertMovies(list: List<Movie>) {
-        for (item in list) {
-            movieDAO.insertMovie(item)
+    override suspend fun getCacheMovies() : List<CacheMovie>{
+        return cacheMovieDAO.getCacheMovies()
+    }
+
+
+    override suspend fun insertCacheMovie(cacheMovie : List<Movie>){
+        var cacheMovieList : List<CacheMovie> = cacheMovie.map { m ->
+            CacheMovie(id = m.id,
+                title = m.title,
+                posterPath = m.posterPath,
+                backdropPath = m.backdropPath,
+                releaseDate = m.releaseDate,
+                overview = m.overview,
+                genreIds = m.genreIds
+                )
         }
-    }
-
-    override suspend fun getCacheMovies() : List<Movie>{
-        return movieDAO.getCacheMovies()
-    }
-
-
-    override suspend fun insertCacheMovie(cacheMovie : List<CacheMovie>){
-        movieDAO.insertCacheMovie(cacheMovie)
+        cacheMovieDAO.insertCacheMovie(cacheMovieList)
     }
 
     override suspend fun deleteAllMovies() {
-        movieDAO.deleteAllMovies()
+        cacheMovieDAO.deleteAllMovies()
     }
 
 }

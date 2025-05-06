@@ -86,7 +86,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
                     if( networkManager.hasInternet) {
                         MovieListUiState.Success(moviesRepository.getTopRatedMovies().results)
                     } else if(lastCacheList == MovieListScreens.TOP_RATED){
-                        MovieListUiState.Success(savedMoviesRepository.getCacheMovies())
+                        MovieListUiState.Success(savedMoviesRepository.getCacheMovies()  as List<Movie>)
                     } else {
                         MovieListUiState.Error
                     }
@@ -105,7 +105,7 @@ class MovieDBViewModel(private val moviesRepository: MoviesRepository,
                 if( networkManager.hasInternet) {
                     MovieListUiState.Success(moviesRepository.getPopularMovies().results)
                 } else if(lastCacheList == MovieListScreens.POPULAR){
-                    MovieListUiState.Success(savedMoviesRepository.getCacheMovies())
+                    MovieListUiState.Success(savedMoviesRepository.getCacheMovies() as List<Movie>)
                 } else {
                     MovieListUiState.Error
                 }

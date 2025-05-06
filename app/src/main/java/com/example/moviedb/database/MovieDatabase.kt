@@ -33,10 +33,12 @@ class Converters {
     }
 }
 
-@Database(entities = [Movie::class, CacheMovie::class], version = 3, exportSchema = false)
+@Database(entities = [Movie::class, CacheMovie::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDataAccessObject
+
+    abstract fun cacheMovieDao(): CacheMovieDataAccessObject
 
     companion object {
         @Volatile
