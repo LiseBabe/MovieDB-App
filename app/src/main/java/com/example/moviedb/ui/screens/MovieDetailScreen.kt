@@ -1,5 +1,6 @@
 package com.example.moviedb.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,9 +42,14 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Switch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.moviedb.network.SaveImageWorker
 
 @Composable
 fun MovieDetailScreen(
@@ -140,6 +146,18 @@ fun MovieImageElement(selectedMovieUiState : SelectedMovieUiState.Success, modif
             modifier = modifier,
             contentScale = ContentScale.Crop
         )
+        val context = LocalContext.current
+
+        Button(onClick = {
+            val workData = workDataOf(SaveImageWorker.IMAGE_URL_KEY to Constants.POSTER_IMAGE_BASE_URL + Constants.POSTER_IMAGE_BASE_WIDTH + (selectedMovieUiState.movie.posterPath ?: ""))
+            val saveImageWorkRequest = OneTimeWorkRequestBuilder<SaveImageWorker>()
+                .setInputData(workData)
+                .build()
+
+            WorkManager.getInstance(context).enqueue(saveImageWorkRequest)
+        }) {
+            Text("Save Poster")
+        }
     }
 }
 
@@ -326,3 +344,4 @@ fun MovieDetailVideoCard(video: Video, fillMaxWidth: Boolean, modifier: Modifier
         )
     }
 }
+
