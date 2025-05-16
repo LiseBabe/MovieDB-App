@@ -1,5 +1,5 @@
 package com.example.moviedb.utils
 
 object SECRETS {
-    const val API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1YTE4NGZlZTBmYTYzZTU4MjQwYzY3Yzk3NDgyY2Y0MSIsIm5iZiI6MTc0MzQzNjI1OS44NTMsInN1YiI6IjY3ZWFiOWUzNjFjYWMyYjNhM2Y3MDliZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Yc_6PHQnvclm5jGfVB8LFISUtptXp_80poJs1LWyD0Y"
+    const val API_KEY = "5a184fee0fa63e58240c67c97482cf41"
 }
